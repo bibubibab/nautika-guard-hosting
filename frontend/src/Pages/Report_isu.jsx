@@ -14,14 +14,27 @@ function Report_isu() {
 
             {/* Image Upload Section */}
             <div className="bg-gray-200 h-40 rounded-lg flex flex-col items-center justify-center mb-4 p-10">
-                <div className="text-gray-400">
-                    <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M4 4h16v16H4z" />
-                    </svg>
-                </div>
-                <p className="text-center text-gray-600 mt-2">Laporkan Pengaduan Anda, Kami Siap Dengar</p>
-                <button className="mt-2 px-4 py-2 bg-[#00609B] text-white rounded hover:bg-blue-700">Upload Bukti</button>
-            </div>
+            <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id="fileInput"
+                onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        console.log("File selected:", file.name); // Tambahkan logika penyimpanan atau pratinjau file di sini
+                    }
+                }}
+            />
+            <label
+                htmlFor="fileInput"
+                className="cursor-pointer px-4 py-2 bg-[#00609B] text-white rounded hover:bg-blue-700"
+            >
+                Upload Bukti
+            </label>
+            <p className="text-center text-gray-600 mt-2">Laporkan Pengaduan Anda, Kami Siap Dengar</p>
+        </div>
+
 
             {/* Form Section */}
             <div className='pt-10'>

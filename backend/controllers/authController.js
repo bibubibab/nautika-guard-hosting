@@ -1,9 +1,5 @@
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import { db } from '../config/db.js';
-
-const JWT_SECRET = 'myVerySecureSecretKey12345!@#$%'; // Ganti dengan secret key Anda
-const JWT_EXPIRATION = '1d'; // Token berlaku selama 1 jam
 
 // Signup Controller
 export const signup = async (req, res) => {
@@ -53,12 +49,7 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
 
-        // Generate JWT
-        const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, {
-            expiresIn: JWT_EXPIRATION,
-        });
-
-        res.status(200).json({ message: 'Login successful', token, userId: user.id });
+        res.status(200).json({ message: 'Login successful', userId: user.id });
     } catch (error) {
         res.status(500).json({ message: 'Server error' });
     }

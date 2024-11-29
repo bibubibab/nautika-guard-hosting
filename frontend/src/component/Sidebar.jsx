@@ -26,7 +26,7 @@ const Sidebar = () => {
                 {/* Logo and Toggle Button */}
                 <div className="flex items-center justify-between w-full p-3">
                     {isOpen && (
-                        <img src="/images/nautika2.png" alt="Logo" className="w-23 h-16 transition-transform duration-300 mt-2" />
+                        <img src="/images/logobiru.png" alt="Logo" className="w-23 h-16 transition-transform duration-300 mt-2" />
                     )}
                     <button onClick={toggleSidebar} className="text-gray-600 focus:outline-none">
                         {isOpen ? (
@@ -67,10 +67,6 @@ const Sidebar = () => {
 
                 {/* Settings and Support at Bottom */}
                 <div className="flex flex-col items-center w-full mt-auto mb-4"> {/* mt-auto to push buttons to the bottom */}
-                    <button onClick={() => navigateTo('Bantuan')} className={`flex items-center  text-lg px-8 py-5 w-full hover:bg-gray-200 ${activePage === 'Bantuan' && 'bg-blue-100'}`}>
-                        <img src="/images/tanya.svg" alt="Bantuan" className="w-6 h-6" />
-                        {isOpen && <span className="ml-4 text-gray-700 font-semibold">Bantuan</span>}
-                    </button>
                     <button onClick={() => navigateTo('Keluar')} className={`flex items-center text-lg px-8 py-5 w-full hover:bg-gray-200 ${activePage === 'Keluar' && 'bg-blue-100'}`}>
                         <img src="/images/signout.svg" alt="Keluar" className="w-8 h-8" />
                         {isOpen && <span className="ml-3 text-gray-700 font-semibold">Keluar</span>}
@@ -88,7 +84,6 @@ const Sidebar = () => {
                     {activePage === 'Donasi' && <div><Donasi /></div>}
                     {activePage === 'Report isu' && <Report_isu />}
                     {activePage === 'Setting' && <div><Profil_User /></div>}
-                    {activePage === 'Bantuan' && <div>Bantuan</div>}
                     {activePage === 'Keluar' && <div><Home_Page/></div>}
                 </div>
             </div>

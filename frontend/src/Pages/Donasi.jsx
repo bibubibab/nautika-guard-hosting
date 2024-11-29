@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Proses_payment from './Proses_Payment';
+import Proses_payment from './Proses_payment';
 // Pastikan import sudah sesuai
 
 function Donasi() {

@@ -1,3 +1,4 @@
+// Proses_payment.jsx
 import React, { useState } from "react";
 import axios from "axios";
 
@@ -5,7 +6,7 @@ function Proses_payment({ donationAmount }) {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
-    const [donation, setDonation] = useState(donationAmount); // Nilai default dari prop
+    const [donation, setDonation] = useState(donationAmount);
     const [hide, setHide] = useState(false);
 
     // Fungsi untuk menangani proses pembayaran
@@ -28,7 +29,7 @@ function Proses_payment({ donationAmount }) {
 
             const { token } = response.data;
 
-            // Integrasi Snap.js
+            // Integrasi Snap.js untuk memproses pembayaran
             window.snap.pay(token, {
                 onSuccess: (result) => {
                     alert("Pembayaran Berhasil!");
@@ -83,22 +84,16 @@ function Proses_payment({ donationAmount }) {
                             />
                         </div>
                         <div>
-                            <label className="block text-gray-700 font-medium mb-" htmlFor="phone">Nomor Telepon:</label>
-                            <div className="flex">
-                                <select className="px-1 py-2 border border-gray-300 rounded-l-lg bg-gray-100 focus:outline-none">
-                                    <option value="+62">+62</option>
-                                    {/* Tambahkan opsi lain jika diperlukan */}
-                                </select>
-                                <input
-                                    type="tel"
-                                    id="phone"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    placeholder="Masukkan Nomor Telepon anda"
-                                    className="w-full px-4 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:ring focus:ring-blue-200"
-                                    required
-                                />
-                            </div>
+                            <label className="block text-gray-700 font-medium mb-2" htmlFor="phone">Nomor Telepon:</label>
+                            <input
+                                type="tel"
+                                id="phone"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                placeholder="Masukkan nomor telepon anda"
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200"
+                                required
+                            />
                         </div>
                         <div>
                             <label className="block text-gray-700 font-medium mb-2" htmlFor="donation">Donasi Anda</label>

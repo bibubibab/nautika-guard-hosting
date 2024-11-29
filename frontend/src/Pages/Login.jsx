@@ -105,6 +105,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Masukkan kata sandi"
               className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-300 focus:outline-none"
+              autoComplete="current-password" // Tambahkan atribut ini
             />
           </div>
 

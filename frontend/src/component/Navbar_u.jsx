@@ -17,7 +17,6 @@ function Navbar_u({ isLoggedIn, setShowLoginPage }) {
         <button className="text-gray-500">
           <i className="fas fa-bell"></i>
         </button>
-        <img src="images/profil.png" alt="Profile" className="w-8 h-8 rounded-full" />
         {!isLoggedIn && (
           <button
             onClick={handleLoginClick}

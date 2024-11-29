@@ -94,6 +94,14 @@ const SignUp = () => {
           </button>
         </form>
       </div>
+      {/* Image Section */}
+      <div className="hidden md:flex w-1/2 bg-white justify-center items-center px-6 py-8 md:p-8 lg:p-12">
+        <img
+          src="/images/plastik.jpg"
+          alt="loginimage"
+          className="w-[790px] h-[px] p-4 object-cover rounded-md"
+        />
+      </div>
     </div>
   );
 };

@@ -26,7 +26,7 @@ const Sidebar = () => {
             <div className={`h-full bg-white transition-all duration-300 ${isOpen ? 'w-64' : 'w-18'}`}>
                 <div className="flex items-center justify-between w-full p-3">
                     {isOpen && (
-                        <img src="/images/nautika2.png" alt="Logo" className="w-23 h-16 transition-transform duration-300 mt-2" />
+                        <img src="/images/logobiru.png" alt="Logo" className="w-23 h-16 transition-transform duration-300 mt-2" />
                     )}
                     <button onClick={toggleSidebar} className="text-gray-600 focus:outline-none">
                         {isOpen ? (

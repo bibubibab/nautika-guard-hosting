@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
-import Suksesvol from './Suksesvol';
+import React, { useState } from "react";
+import Suksesvol from "./Suksesvol";
+import axios from "axios";
 
 const Fevent = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    interestReason: '',
-    suitabilityReason: '',
-    jobRole: '',
-    phoneNumber: '',
-    email: '',
+    firstName: "",
+    lastName: "",
+    interestReason: "",
+    suitabilityReason: "",
+    jobRole: "",
+    phoneNumber: "",
+    email: "",
   });
-  const [redirect, setRedirect] = useState(false); // New state for conditional rendering
+  const [redirect, setRedirect] = useState(false);
+  const [error, setError] = useState(null); // Untuk menangani pesan error
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,21 +23,51 @@ const Fevent = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Simple validation: Check if all fields are filled
-    const isFormValid = Object.values(formData).every((field) => field.trim() !== '');
+    // Validasi sebelum mengirim data
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10,15}$/;
 
-    if (isFormValid) {
-      // Set redirect to true to render Suksesvol component
-      setRedirect(true);
-    } else {
-      alert('Please fill in all fields.');
+    if (!emailRegex.test(formData.email)) {
+      setError("Format email tidak valid.");
+      return;
+    }
+    if (!phoneRegex.test(formData.phoneNumber)) {
+      setError("Nomor HP harus terdiri dari 10-15 digit angka.");
+      return;
+    }
+    if (Object.values(formData).some((field) => field.trim() === "")) {
+      setError("Harap isi semua field sebelum mengirim.");
+      return;
+    }
+
+    try {
+      // Kirim data ke backend
+      const response = await axios.post("http://localhost:3001/volunteer", {
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        interestReason: formData.interestReason, // Perbaiki di sini
+        suitabilityReason: formData.suitabilityReason, // Perbaiki di sini
+        jobSection: formData.jobRole,
+        phoneNumber: formData.phoneNumber, // Perbaiki di sini
+    });
+    
+
+      console.log("Data berhasil disimpan:", response.data);
+      setRedirect(true); // Redirect ke halaman sukses
+    } catch (error) {
+      if (error.response) {
+        setError(error.response.data.message || "Gagal mengirim data.");
+      } else {
+        setError("Terjadi kesalahan. Silakan coba lagi.");
+      }
     }
   };
 
-  // Render Suksesvol component if redirect is true
+  // Redirect ke halaman sukses jika pengiriman berhasil
   if (redirect) {
     return <Suksesvol />;
   }
@@ -43,22 +75,12 @@ const Fevent = () => {
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
       <h2 className="text-2xl font-semibold mb-4 mt-3">Daftar Menjadi Pejuang</h2>
-      
+
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-3xl">
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Kepada:</label>
-              <input
-                type="text"
-                value="Sungai Cimanbo, Bandung, Jawa Barat"
-                readOnly
-                className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-700"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-6 mt-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nama Depan:</label>
               <input
@@ -87,7 +109,7 @@ const Fevent = () => {
           </div>
 
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mengapa Anda Tertarik Untuk Menjadi Relawan Pada Aktivitas Ini?</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Mengapa Anda Tertarik?</label>
             <textarea
               name="interestReason"
               value={formData.interestReason}
@@ -100,7 +122,7 @@ const Fevent = () => {
           </div>
 
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mengapa Anda Adalah Relawan Yang Tepat Untuk Aktivitas Ini?</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Mengapa Anda Tepat?</label>
             <textarea
               name="suitabilityReason"
               value={formData.suitabilityReason}
@@ -114,7 +136,7 @@ const Fevent = () => {
 
           <div className="grid grid-cols-2 gap-6 mt-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Bagian Pekerjaan Apa? (Pembersihan/Sosialisasi?)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Bagian Pekerjaan:</label>
               <input
                 type="text"
                 name="jobRole"
@@ -152,7 +174,7 @@ const Fevent = () => {
               required
             />
           </div>
-          
+
           <div className="flex justify-center">
             <button
               type="submit"
