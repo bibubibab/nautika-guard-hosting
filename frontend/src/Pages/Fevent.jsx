@@ -4,16 +4,16 @@ import axios from "axios";
 
 const Fevent = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    interestReason: "",
-    suitabilityReason: "",
-    jobRole: "",
-    phoneNumber: "",
+    first_name: "",
+    last_name: "",
+    interest_reason: "",
+    suitability_reason: "",
+    job_role: "",
+    phone_number: "",
     email: "",
   });
   const [redirect, setRedirect] = useState(false);
-  const [error, setError] = useState(null); // Untuk menangani pesan error
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,7 +26,7 @@ const Fevent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validasi sebelum mengirim data
+    // Validasi email dan nomor HP
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10,15}$/;
 
@@ -34,7 +34,7 @@ const Fevent = () => {
       setError("Format email tidak valid.");
       return;
     }
-    if (!phoneRegex.test(formData.phoneNumber)) {
+    if (!phoneRegex.test(formData.phone_number)) {
       setError("Nomor HP harus terdiri dari 10-15 digit angka.");
       return;
     }
@@ -45,16 +45,7 @@ const Fevent = () => {
 
     try {
       // Kirim data ke backend
-      const response = await axios.post("http://localhost:3001/volunteer", {
-        email: formData.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        interestReason: formData.interestReason, // Perbaiki di sini
-        suitabilityReason: formData.suitabilityReason, // Perbaiki di sini
-        jobSection: formData.jobRole,
-        phoneNumber: formData.phoneNumber, // Perbaiki di sini
-    });
-    
+      const response = await axios.post("http://localhost:3001/volunteer", formData);
 
       console.log("Data berhasil disimpan:", response.data);
       setRedirect(true); // Redirect ke halaman sukses
@@ -80,13 +71,14 @@ const Fevent = () => {
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
         <form onSubmit={handleSubmit}>
+          {/* Formulir input data */}
           <div className="grid grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nama Depan:</label>
               <input
                 type="text"
-                name="firstName"
-                value={formData.firstName}
+                name="first_name"
+                value={formData.first_name}
                 onChange={handleChange}
                 placeholder="Masukkan Nama Depan"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md"
@@ -98,8 +90,8 @@ const Fevent = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Nama Belakang:</label>
               <input
                 type="text"
-                name="lastName"
-                value={formData.lastName}
+                name="last_name"
+                value={formData.last_name}
                 onChange={handleChange}
                 placeholder="Masukkan Nama Belakang"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md"
@@ -108,11 +100,12 @@ const Fevent = () => {
             </div>
           </div>
 
+          {/* Alasan Ketertarikan */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Mengapa Anda Tertarik?</label>
             <textarea
-              name="interestReason"
-              value={formData.interestReason}
+              name="interest_reason"
+              value={formData.interest_reason}
               onChange={handleChange}
               rows="4"
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
@@ -121,11 +114,12 @@ const Fevent = () => {
             ></textarea>
           </div>
 
+          {/* Alasan Kesesuaian */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Mengapa Anda Tepat?</label>
             <textarea
-              name="suitabilityReason"
-              value={formData.suitabilityReason}
+              name="suitability_reason"
+              value={formData.suitability_reason}
               onChange={handleChange}
               rows="4"
               className="w-full px-4 py-2 border border-gray-300 rounded-md"
@@ -134,13 +128,14 @@ const Fevent = () => {
             ></textarea>
           </div>
 
+          {/* Bagian Pekerjaan dan No Handphone */}
           <div className="grid grid-cols-2 gap-6 mt-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Bagian Pekerjaan:</label>
               <input
                 type="text"
-                name="jobRole"
-                value={formData.jobRole}
+                name="job_role"
+                value={formData.job_role}
                 onChange={handleChange}
                 placeholder="Pilih Bagian Pekerjaan"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md"
@@ -152,8 +147,8 @@ const Fevent = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">No Handphone:</label>
               <input
                 type="tel"
-                name="phoneNumber"
-                value={formData.phoneNumber}
+                name="phone_number"
+                value={formData.phone_number}
                 onChange={handleChange}
                 placeholder="Masukkan No Handphone"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md"
@@ -162,6 +157,7 @@ const Fevent = () => {
             </div>
           </div>
 
+          {/* Email */}
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Email:</label>
             <input

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import Datav_Admin from './Datav_Admin'; 
+import Datav_Admin from './Datav_Admin';
 import Approval_Admin from './Approval_Admin';
 
 const notifications = [
     {
         id: 1,
         type: 'Volunteer Registration',
+        volunteerId: 1, // Tambahkan ID unik untuk tiap notifikasi
         name: 'Galih Raditya',
         email: 'Galihraditya@gmail.com',
         title: 'Pencemaran Sungai Brantas',
@@ -13,61 +14,12 @@ const notifications = [
         date: '28 Juni 2024',
         avatar: 'https://via.placeholder.com/80',
     },
-    {
-        id: 2,
-        type: 'Issue Report',
-        name: 'Bernadya',
-        email: 'blmadabln@gmail.com',
-        title: 'Pencemaran Sungai Cipayung',
-        message: 'Saya ingin melaporkan kondisi Sungai Brantas di Gresik ...',
-        date: '10 Mei 2024',
-        avatar: 'https://via.placeholder.com/80',
-    },
-    {
-        id: 3,
-        type: 'Volunteer',
-        name: 'Galih Raditya',
-        email: 'Galihraditya@gmail.com',
-        title: 'Pencemaran Sungai Brantas',
-        message: 'Saya ingin melaporkan kondisi Sungai Brantas di Gresik ...',
-        date: '28 Juni 2024',
-        avatar: 'https://via.placeholder.com/80',
-    },
-    {
-        id: 4,
-        type: 'Donation',
-        name: 'Galih Raditya',
-        email: 'Galihraditya@gmail.com',
-        title: 'Pencemaran Sungai Brantas',
-        message: 'Saya ingin melaporkan kondisi Sungai Brantas di Gresik ...',
-        date: '28 Juni 2024',
-        avatar: 'https://via.placeholder.com/80',
-    },
-    {
-        id: 5,
-        type: 'Donation',
-        name: 'Galih Raditya',
-        email: 'Galihraditya@gmail.com',
-        title: 'Pencemaran Sungai Brantas',
-        message: 'Saya ingin melaporkan kondisi Sungai Brantas di Gresik ...',
-        date: '28 Juni 2024',
-        avatar: 'https://via.placeholder.com/80',
-    },
-    {
-        id: 6,
-        type: 'Donation',
-        name: 'Galih Raditya',
-        email: 'Galihraditya@gmail.com',
-        title: 'Pencemaran Sungai Brantas',
-        message: 'Saya ingin melaporkan kondisi Sungai Brantas di Gresik ...',
-        date: '28 Juni 2024',
-        avatar: 'https://via.placeholder.com/80',
-    },
+    // Notifikasi lainnya...
 ];
 
 const NotificationItem = ({ notification, onClick }) => (
     <div
-        onClick={() => onClick(notification.type)}
+        onClick={() => onClick(notification.type, notification.volunteerId)} // Kirim volunteerId saat diklik
         className="flex items-start bg-white p-4 shadow-md rounded-lg mb-4 cursor-pointer"
     >
         <div className="mr-4">
@@ -96,11 +48,13 @@ const NotificationItem = ({ notification, onClick }) => (
 
 const Notification_Admin = () => {
     const [activeComponent, setActiveComponent] = useState(null);
+    const [selectedVolunteerId, setSelectedVolunteerId] = useState(null); // Simpan volunteerId yang dipilih
 
-    const handleNotificationClick = (type) => {
+    const handleNotificationClick = (type, volunteerId) => {
         if (type === 'Issue Report') {
             setActiveComponent('Input_Event');
         } else if (type === 'Donation' || type === 'Volunteer Registration') {
+            setSelectedVolunteerId(volunteerId); // Set volunteerId yang dipilih
             setActiveComponent('Datav_Admin');
         }
     };
@@ -121,7 +75,7 @@ const Notification_Admin = () => {
             ) : activeComponent === 'Input_Event' ? (
                 <Approval_Admin/>
             ) : (
-                <Datav_Admin />
+                <Datav_Admin volunteerId={selectedVolunteerId} /> // Kirim volunteerId ke Datav_Admin
             )}
         </div>
     );

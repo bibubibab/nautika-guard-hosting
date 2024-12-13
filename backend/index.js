@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import mysql from "mysql2/promise";
+import multer from "multer";
+import path from 'path';
 import midtransClient from "midtrans-client";
 
 const app = express();
@@ -60,7 +62,7 @@ app.post("/signup", async (req, res) => {
   }
 });
 
-// Endpoint Login (Admin dan User)
+// Endpoint Login (Admin dan User
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -149,7 +151,8 @@ app.post("/proses_payment", async (req, res) => {
   }
 });
 
-app.post('/volunteer_application', async (req, res) => {
+// data masuk Formulir volunteer
+app.post('/volunteer', async (req, res) => {
     try {
       const {
         first_name,
@@ -196,7 +199,7 @@ app.post('/volunteer_application', async (req, res) => {
   
       // Simpan ke database
       const query = `
-        INSERT INTO volunteer_application 
+        INSERT INTO volunteer 
         (first_name, last_name, email, phone_number, interest_reason, suitability_reason, job_role) 
         VALUES (?, ?, ?, ?, ?, ?, ?)
       `;
@@ -217,6 +220,184 @@ app.post('/volunteer_application', async (req, res) => {
       res.status(500).json({ message: "Server error" });
     }
   });
+
+// Menyajikan file statis dari folder 'uploads'
+app.use("/uploads", express.static("uploads"));
+
+// Konfigurasi Multer untuk upload file
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Direktori tempat file akan disimpan
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Nama file unik
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// Fetch a specific volunteer by ID
+app.get('/volunteer/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await db.execute('SELECT * FROM volunteer WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Volunteer not found' });
+    }
+    res.json(rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching volunteer data' });
+  }
+});
+
+
+// Endpoint untuk mengunggah laporan isu
+app.post("/report_issue", upload.single("photo"), async (req, res) => {
+  try {
+    const {
+      full_name,
+      phone,
+      title,
+      location,
+      description,
+      expectation,
+    } = req.body;
+
+    const photo = req.file ? req.file.filename : null;
+
+    // Validasi input
+    if (
+      !full_name ||
+      !phone ||
+      !title ||
+      !location ||
+      !description ||
+      !expectation ||
+      !photo
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Semua field wajib diisi, termasuk foto." });
+    }
+
+    // Simpan data ke database
+    const query = `
+      INSERT INTO issue 
+      (full_name, phone, title, location, description, expectation, photo) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [
+      full_name,
+      phone,
+      title,
+      location,
+      description,
+      expectation,
+      photo,
+    ];
+    await db.execute(query, values);
+
+    res
+      .status(201)
+      .json({ message: "Laporan berhasil disimpan", photo_url: `/uploads/${photo}` });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Gagal menyimpan laporan", error });
+  }
+});
+
+// GET Profile Data by ID
+app.get("/user/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Ambil data user berdasarkan ID
+    const [rows] = await db.execute("SELECT id, fullName, email FROM user WHERE id = ?", [id]);
+
+    // Jika user tidak ditemukan
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    res.status(200).json({ message: "User ditemukan", user: rows[0] });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Gagal mengambil data user", error });
+  }
+});
+
+// PUT Update Profile Data
+app.put("/user", async (req, res) => {
+  const { id, fullName, email, password } = req.body;
+
+  try {
+    // Validasi input
+    if (!id || !fullName || !email || !password) {
+      return res.status(400).json({ message: "Semua data wajib diisi" });
+    }
+
+    // Query untuk update data user
+    const [result] = await db.execute(
+      "UPDATE user SET fullName = ?, email = ?, password = ? WHERE id = ?",
+      [fullName, email, password, id]
+    );
+
+    // Cek apakah ada data yang diperbarui
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    res.status(200).json({ message: "Profil berhasil diperbarui" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Gagal memperbarui profil", error });
+  }
+});
+
+// PUT Change Password
+app.put("/user/change-password", async (req, res) => {
+  const { id, oldPassword, newPassword } = req.body;
+
+  try {
+    // Validasi input
+    if (!id || !oldPassword || !newPassword) {
+      return res.status(400).json({ message: "Semua data wajib diisi" });
+    }
+
+    // Cek apakah password lama sesuai dengan yang ada di database
+    const [rows] = await db.execute("SELECT password FROM user WHERE id = ?", [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    const storedPassword = rows[0].password;
+
+    // Verifikasi password lama
+    if (storedPassword !== oldPassword) {
+      return res.status(400).json({ message: "Password lama tidak sesuai" });
+    }
+
+    // Update password jika validasi berhasil
+    const [result] = await db.execute("UPDATE user SET password = ? WHERE id = ?", [
+      newPassword,
+      id,
+    ]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "User tidak ditemukan" });
+    }
+
+    res.status(200).json({ message: "Password berhasil diperbarui" });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Gagal memperbarui password", error });
+  }
+});
+
+
+
   
 // Endpoint Utama
 app.get("/", (req, res) => {
