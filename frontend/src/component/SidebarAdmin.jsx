@@ -54,10 +54,6 @@ const Sidebar = () => {
                         <img src="/images/donasi.svg" alt="Notifikasi" className="w-6 h-6" />
                         {isOpen && <span className="ml-4 text-gray-700 font-semibold">Notifikasi</span>}
                     </button>
-                    <button onClick={() => navigateTo('Laporan')} className={`flex items-center text-lg px-8 py-5 w-full hover:bg-gray-200 ${activePage === 'Laporan' && 'bg-blue-100'}`}>
-                        <img src="/images/lapor.svg" alt="Laporan" className="w-6 h-6" />
-                        {isOpen && <span className="ml-4 text-gray-700 font-semibold">Laporan</span>}
-                    </button>
                     <button onClick={() => navigateTo('Setting')} className={`flex items-center text-lg px-8 py-5 w-full hover:bg-gray-200 ${activePage === 'Setting' && 'bg-blue-100'}`}>
                         <img src="/images/pengaturan.svg" alt="Setting" className="w-6 h-6" />
                         {isOpen && <span className="ml-4 text-gray-700 font-semibold">Setting</span>}
@@ -78,7 +74,6 @@ const Sidebar = () => {
                     {activePage === 'Home Page' && <Home_Page/>}
                     {activePage === 'Event' && <div><Input_Event/></div>}
                     {activePage === 'Notifikasi' && <div><Notification_Admin/></div>}
-                    {activePage === 'Laporan' && <Approval_Admin/>}
                     {activePage === 'Setting' && <div><Profil_Admin/></div>}
                     {activePage === 'Keluar' && <div><Home_Page/></div>}
                 </div>

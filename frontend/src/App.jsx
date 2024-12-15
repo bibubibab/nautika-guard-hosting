@@ -8,7 +8,8 @@ import SignUp from './Pages/SignUp'; // Pastikan SignUp sudah diimpor
 import AdminPage from './component/SidebarAdmin';
 import UserPage from './component/Sidebar';
 import Proses_payment from './Pages/Proses_payment'; // Pastikan jalur impor benar
-import Datav_Admin from './Admin/Datav_Admin';
+import Notification_Admin from './Admin/Notification_Admin'; // Halaman notifikasi
+import Approval_Admin from "./Admin/Approval_Admin"; // Halaman approval
 import axios from "axios";
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -30,7 +31,12 @@ function AppContent() {
         <Route path="/SidebarAdmin" element={isAuthenticated && isAdmin ? <AdminPage /> : <Navigate to="/login" />} />
         <Route path="/Sidebar" element={isAuthenticated && !isAdmin ? <UserPage /> : <Navigate to="/login" />} />
         <Route path="/proses-payment" element={<Proses_payment donationAmount={10000} />} />
-        <Route path="/admin/volunteers/:volunteerId" element={<Datav_Admin />} />
+        {/* Route untuk daftar notifikasi */}
+        <Route path="/notifications" element={<Notification_Admin />} />
+
+        {/* Route untuk halaman detail laporan berdasarkan ID */}
+        <Route path="/report/:id" element={<Approval_Admin />} />
+        
 
         {/* Tambahkan rute catch-all */}
         <Route path="*" element={<h1>404 - Halaman Tidak Ditemukan</h1>} />

@@ -69,39 +69,39 @@ function Report_isu() {
   }
 
   return (
-    <div className="w-100% p-4 bg-gray-100 rounded-lg shadow-md font-Poppins">
-        <h1 className="text-xl font-semibold text-gray-800 mb-4">Sampaikan Aduan Anda</h1>
+    <div className="w-full p-4 bg-gray-100 rounded-lg shadow-md font-Poppins">
+      <h1 className="text-xl font-semibold text-gray-800 mb-4">Sampaikan Aduan Anda</h1>
 
       {/* Image Upload Section */}
-    <div className="bg-gray-200 h-75 rounded-lg flex flex-col items-center justify-center mb-4 p-10">
+      <div className="bg-gray-200 h-75 rounded-lg flex flex-col items-center justify-center mb-4 p-10">
         <input
-        type="file"
-        accept="image/*"
-        className="hidden"
-        id="fileInput"
-        onChange={handleFileChange}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          id="fileInput"
+          onChange={handleFileChange}
         />
         <label
-        htmlFor="fileInput"
-        className="cursor-pointer px-4 py-2 bg-[#00609B] text-white rounded hover:bg-blue-700"
+          htmlFor="fileInput"
+          className="cursor-pointer px-4 py-2 bg-[#00609B] text-white rounded hover:bg-blue-700"
         >
-        Upload Bukti
+          Upload Bukti
         </label>
 
         {/* Display file name or preview */}
         {file && (
-            <div className="mt-2 text-center text-gray-700">
+          <div className="mt-2 text-center text-gray-700">
             <p>{file.name}</p>
             {/* Tampilkan pratinjau gambar jika file adalah gambar */}
             <img
-            src={URL.createObjectURL(file)}
-            alt="Preview"
-            className="mt-2 mx-auto"
-            style={{
-                maxWidth: "100%",   // Menyesuaikan dengan lebar kontainer
+              src={URL.createObjectURL(file)}
+              alt="Preview"
+              className="mt-2 mx-auto"
+              style={{
+                maxWidth: "100%", // Menyesuaikan dengan lebar kontainer
                 maxHeight: "200px", // Membatasi tinggi gambar agar tidak terlalu besar
-                objectFit: "contain"
-            }} // Memastikan gambar tetap proporsional
+                objectFit: "contain",
+              }} // Memastikan gambar tetap proporsional
             />
           </div>
         )}

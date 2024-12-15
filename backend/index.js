@@ -264,7 +264,12 @@ app.post("/report_issue", upload.single("photo"), async (req, res) => {
       expectation,
     } = req.body;
 
-    const photo = req.file ? req.file.filename : null;
+    // Validasi file foto
+    if (!req.file) {
+      return res.status(400).json({ message: "Foto wajib diunggah." });
+    }
+
+    const photo = req.file.filename;
 
     // Validasi input
     if (
@@ -273,8 +278,7 @@ app.post("/report_issue", upload.single("photo"), async (req, res) => {
       !title ||
       !location ||
       !description ||
-      !expectation ||
-      !photo
+      !expectation
     ) {
       return res
         .status(400)
@@ -284,8 +288,8 @@ app.post("/report_issue", upload.single("photo"), async (req, res) => {
     // Simpan data ke database
     const query = `
       INSERT INTO issue 
-      (full_name, phone, title, location, description, expectation, photo) 
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+  (full_name, phone, title, location, description, expectation, photo, status) 
+  VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')
     `;
     const values = [
       full_name,
@@ -298,14 +302,109 @@ app.post("/report_issue", upload.single("photo"), async (req, res) => {
     ];
     await db.execute(query, values);
 
-    res
-      .status(201)
-      .json({ message: "Laporan berhasil disimpan", photo_url: `/uploads/${photo}` });
+    // Menyimpan notifikasi ke database admin
+    const currentDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+    const notificationQuery = `
+  INSERT INTO notifications (type, name, email, title, message, date, avatar)
+  VALUES ('Issue Report', ?, ?, ?, ?, ?, ?)
+`;
+const notificationValues = [
+  full_name,
+  phone, // gunakan email jika diperlukan
+  title,
+  description,
+  currentDate,
+  "https://via.placeholder.com/80", // Placeholder avatar
+];
+await db.execute(notificationQuery, notificationValues);
+
+
+    res.status(201).json({ 
+      message: "Laporan berhasil disimpan", 
+      photo_url: `/uploads/${photo}` 
+    });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Gagal menyimpan laporan", error });
   }
 });
+
+app.get("/reports", async (req, res) => {
+  try {
+    const query = "SELECT * FROM issue ORDER BY created_at DESC";
+    const [reports] = await db.execute(query);
+    res.status(200).json(reports);
+  } catch (error) {
+    console.error("Error fetching reports:", error);
+    res.status(500).json({ message: "Terjadi kesalahan saat mengambil laporan." });
+  }
+});
+
+// LAPORAN TERGANTUNG USER
+app.get("/user/issues", async (req, res) => {
+  const userId = req.user.id; // Pastikan middleware autentikasi memberikan ID pengguna
+
+  try {
+    const query =
+      "SELECT id, title, status FROM issue WHERE user_id = ? ORDER BY created_at DESC LIMIT 1";
+    const [report] = await db.execute(query, [userId]);
+
+    if (report.length === 0) {
+      return res.status(404).json({ message: "Belum ada laporan yang diajukan." });
+    }
+
+    res.status(200).json(report[0]); // Kirim laporan terbaru
+  } catch (error) {
+    console.error("Error fetching user issue:", error);
+    res.status(500).json({ message: "Terjadi kesalahan saat mengambil laporan." });
+  }
+});
+
+
+
+
+// MENAMPILKAN NOTIFIKASI 
+// Endpoint untuk mendapatkan notifikasi
+app.get("/notifications", async (req, res) => {
+  try {
+    const query = "SELECT * FROM notifications ORDER BY date DESC";
+    const [notifications] = await db.execute(query);
+    res.status(200).json(notifications);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Gagal mengambil notifikasi", error });
+  }
+});
+
+app.put("/issues/:id/status", async (req, res) => {
+  const { status } = req.body;
+  const { id } = req.params;
+
+  try {
+    // Validasi status
+    if (!["Pending", "Disetujui", "Ditolak", "Sedang Diperiksa"].includes(status)) {
+      return res.status(400).json({ message: "Status tidak valid." });
+    }
+
+    // Update status laporan
+    const query = "UPDATE issue SET status = ? WHERE id = ?";
+    const values = [status, id];
+    const [result] = await db.execute(query, values);
+
+    if (result.affectedRows > 0) {
+      res.status(200).json({ message: "Status berhasil diperbarui." });
+    } else {
+      res.status(404).json({ message: "Laporan tidak ditemukan." });
+    }
+  } catch (error) {
+    console.error("Error updating status:", error);
+    res.status(500).json({ message: "Gagal memperbarui status." });
+  }
+});
+
+
+
+
 
 // GET Profile Data by ID
 app.get("/user/:id", async (req, res) => {
